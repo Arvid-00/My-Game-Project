@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml.XPath;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine.Rendering;
+using Unity.VisualScripting;
 
 public class Pathfinding
 {
@@ -17,13 +18,16 @@ public class Pathfinding
     List<GNode> searchList = new List<GNode>();
     List<GNode> processedList = new List<GNode>();
 
-    public Pathfinding (int width, int height)
+    public Pathfinding (Grid grid)
     {
-        
+        this.grid = grid;
     }
 
     public List<GNode> FindPath(GNode startNode, GNode targetNode)
     {
+        searchList.Clear();
+        processedList.Clear();
+        Debug.Log("test1");
         searchList.Add(startNode);
         ResetGridValues();
 
@@ -32,19 +36,34 @@ public class Pathfinding
 
         while(searchList.Count() > 0)
         {
+            Debug.Log("test2");
             GNode current = GetLowestFNode();
+
             if (current == targetNode)
                 return CalculatePath(targetNode); //found target
             searchList.Remove(current);
             processedList.Add(current);
-
-            foreach(GNode neighbour in CheckNeighbourNodes(current))
+            
+            foreach (GNode neighbour in CheckNeighbourNodes(current))
             {
                 if (processedList.Contains(neighbour))
-                    continue;
-                float totalG = current.g + CalculateDistanceCost(current, neighbour);
-                if(totalG < neighbour.g)
                 {
+                    Debug.Log("Neighbour already prossessed");
+                    continue;
+                }
+                if (neighbour.wall == true)
+                {
+                    Debug.Log("neighbour is a wall");
+                    processedList.Add(neighbour);
+                    continue;
+                }
+                Debug.Log("testbonus");
+                float totalG = current.g + CalculateDistanceCost(current, neighbour);
+                //Debug.Log("total g : " + totalG);
+                //Debug.Log("neighbour g: " + neighbour.g);
+                if (totalG < neighbour.g)
+                {
+                    Debug.Log("test3");
                     neighbour.previousNode = current;
                     neighbour.SetG(totalG);
                     neighbour.SetH(CalculateDistanceCost(neighbour, targetNode));
@@ -53,13 +72,15 @@ public class Pathfinding
                     if (!searchList.Contains(neighbour))
                     {
                         searchList.Add(neighbour);
+                        Debug.Log("test4");
                     }
                 }
             }
 
         }
 
-        searchList.Clear(); //clear list after target node found
+        //processedList.Clear();
+        //searchList.Clear(); //clear list after target node found
         return null; 
     }
 
@@ -116,11 +137,14 @@ public class Pathfinding
     private void ResetGridValues()
     {
         for (int x = 0; x < grid.width; x++)
+        {
             for (int y = 0; y < grid.height; y++)
             {
                 grid.gridArray[x, y].SetG(int.MaxValue);
                 grid.gridArray[x, y].previousNode = null;
             }
+        }
+            
     }
     private GNode GetLowestFNode()
     {

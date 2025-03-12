@@ -1,10 +1,12 @@
-using System.Runtime.InteropServices.WindowsRuntime;
+using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 
 public class GNode
 {
     public int x, y;
     public int tileValue;
+    public bool wall;
 
     public GNode previousNode;
     public float h { get; set; }
@@ -17,12 +19,17 @@ public class GNode
         this.y = y;
         previousNode = null; 
 
-        tileValue = Random.Range(0, 2);
+        int rnd = Random.Range(0, 3);
+        if (rnd == 2)
+            this.wall = true;
+        else
+            this.wall = false;
+        this.tileValue = 0;
     }
 
-    public void SetG(float g) => g = g;
+    public void SetG(float g) => this.g = g;
 
-    public void SetH(float h) => h = h;
+    public void SetH(float h) => this.h = h;
     public float GetF() => f;
 
 
