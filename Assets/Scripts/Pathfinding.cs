@@ -27,7 +27,6 @@ public class Pathfinding
     {
         searchList.Clear();
         processedList.Clear();
-        Debug.Log("test1");
         searchList.Add(startNode);
         ResetGridValues();
 
@@ -36,43 +35,42 @@ public class Pathfinding
 
         while(searchList.Count() > 0)
         {
-            Debug.Log("test2");
             GNode current = GetLowestFNode();
 
             if (current == targetNode)
                 return CalculatePath(targetNode); //found target
             searchList.Remove(current);
             processedList.Add(current);
-            
+            int i = 0;
+
             foreach (GNode neighbour in CheckNeighbourNodes(current))
             {
+                i++;
                 if (processedList.Contains(neighbour))
                 {
-                    Debug.Log("Neighbour already prossessed");
                     continue;
                 }
                 if (neighbour.wall == true)
                 {
-                    Debug.Log("neighbour is a wall");
                     processedList.Add(neighbour);
                     continue;
                 }
-                Debug.Log("testbonus");
                 float totalG = current.g + CalculateDistanceCost(current, neighbour);
                 //Debug.Log("total g : " + totalG);
                 //Debug.Log("neighbour g: " + neighbour.g);
+                //Debug.Log("node: " + neighbour.x + " " + neighbour.y + " has values: f " + neighbour.GetF() + " g " + neighbour.g + " h " + neighbour.h);
                 if (totalG < neighbour.g)
                 {
-                    Debug.Log("test3");
+                    //Debug.Log("1 node: " + neighbour.x + " " + neighbour.y + " " + neighbour.GetF());
                     neighbour.previousNode = current;
                     neighbour.SetG(totalG);
                     neighbour.SetH(CalculateDistanceCost(neighbour, targetNode));
-                    //maybe update F value
+                    //maybe upfate F
+                    //Debug.Log("2 node: " + neighbour.x + " " + neighbour.y + " " + neighbour.GetF());
 
                     if (!searchList.Contains(neighbour))
                     {
                         searchList.Add(neighbour);
-                        Debug.Log("test4");
                     }
                 }
             }
@@ -105,18 +103,22 @@ public class Pathfinding
         if(current.x > 0) //check left neighbours
         {
             neighbourList.Add(grid.gridArray[current.x - 1, current.y]); // left
+            /*
             if (current.y > 0)
                 neighbourList.Add(grid.gridArray[current.x - 1, current.y - 1]); //left down
             if (current.y < grid.height - 1)
                 neighbourList.Add(grid.gridArray[current.x - 1, current.y + 1]); //left up
+            */
         }
         if(current.x < grid.width - 1)
         {
             neighbourList.Add(grid.gridArray[current.x + 1, current.y]); // right
+            /*
             if (current.y > 0)
                 neighbourList.Add(grid.gridArray[current.x + 1, current.y - 1]); //right down
             if (current.y < grid.height - 1)
                 neighbourList.Add(grid.gridArray[current.x + 1, current.y + 1]); //right up
+            */
         }
         if (current.y > 0)
             neighbourList.Add(grid.gridArray[current.x, current.y - 1]); //down
